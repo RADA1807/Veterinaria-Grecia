@@ -41,5 +41,6 @@ app.get('/api', (req, res) => {
   res.json({ message: '✅ API funcionando en Vercel desde /api' });
 });
 
-// 9. Exportar la app (Vercel la usará como handler)
+// ❌ Eliminar app.listen()
+// ✅ Exportar la instancia de Express
 module.exports = app;
