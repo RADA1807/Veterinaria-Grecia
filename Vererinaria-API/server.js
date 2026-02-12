@@ -36,8 +36,15 @@ app.get('/', (req, res) => {
   res.json({ message: '✅ API funcionando y conectada a MySQL' });
 });
 
-// 8. Iniciar servidor
+// 8. Ruta de prueba para Vercel
+app.get('/api', (req, res) => {
+  res.json({ message: '✅ API funcionando en Vercel desde /api' });
+});
+
+// 9. Iniciar servidor
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, '0.0.0.0', () => {   // 👈 importante para que sea accesible
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
+
+module.exports = app;
