@@ -41,10 +41,5 @@ app.get('/api', (req, res) => {
   res.json({ message: '✅ API funcionando en Vercel desde /api' });
 });
 
-// 9. Iniciar servidor
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, '0.0.0.0', () => {   // 👈 importante para que sea accesible
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-});
-
+// 9. Exportar la app (Vercel la usará como handler)
 module.exports = app;
