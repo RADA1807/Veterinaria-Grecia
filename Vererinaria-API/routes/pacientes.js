@@ -4,7 +4,7 @@ const db = require('../models/db');
 const { v4: uuidv4 } = require('uuid');
 
 // 🐾 Obtener todos los pacientes (con filtro por propietario opcional)
-router.get('/api/pacientes', async (req, res) => {
+router.get('/', async (req, res) => {
   const { propietario_id } = req.query;
 
   try {
@@ -24,7 +24,7 @@ router.get('/api/pacientes', async (req, res) => {
 });
 
 // 🔍 Obtener un paciente por ID
-router.get('/api/pacientes/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     let { id } = req.params;
     id = id?.trim();
@@ -51,7 +51,7 @@ router.get('/api/pacientes/:id', async (req, res) => {
 });
 
 // 🐶 Registrar un nuevo paciente
-router.post('/api/pacientes', async (req, res) => {
+router.post('/', async (req, res) => {
   const { nombre, especie, raza, edad, historial_medico, propietario_id } = req.body;
 
   if (!nombre || !especie || !raza || !edad || !historial_medico || !propietario_id) {
@@ -93,7 +93,7 @@ router.post('/api/pacientes', async (req, res) => {
 });
 
 // 🩺 Actualizar paciente existente
-router.put('/api/pacientes/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
   const { nombre, especie, raza, edad, historial_medico, propietario_id } = req.body;
   const { id } = req.params;
 
@@ -130,11 +130,10 @@ router.put('/api/pacientes/:id', async (req, res) => {
 });
 
 // 🗑️ Eliminar paciente y condicionalmente su propietario
-router.delete('/api/pacientes/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Obtener propietario_id del paciente
     const [[paciente]] = await db.query('SELECT propietario_id FROM pacientes WHERE id = ?', [id]);
 
     if (!paciente) {
@@ -143,10 +142,8 @@ router.delete('/api/pacientes/:id', async (req, res) => {
 
     const propietarioId = paciente.propietario_id;
 
-    // Eliminar el paciente
     await db.query('DELETE FROM pacientes WHERE id = ?', [id]);
 
-    // Verificar si el propietario tiene más pacientes
     const [[{ count }]] = await db.query(
       'SELECT COUNT(*) AS count FROM pacientes WHERE propietario_id = ?',
       [propietarioId]

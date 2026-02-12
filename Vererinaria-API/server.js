@@ -1,26 +1,43 @@
+// 1. Importar dependencias
 const express = require('express');
 const cors = require('cors');
-const app = express();
 const dotenv = require('dotenv');
-const pacientesRoutes = require('./routes/pacientes'); const propietariosRoutes = require('./routes/propietarios');
 
-
+const app = express();
 dotenv.config();
 
+// 2. Importar conexión a la base de datos
 const db = require('./models/db');
 
-const authRoutes = require("./routes/auth");
-app.use(cors()); // ✅ Nuevo: habilita CORS
-app.use(express.json()); // ✅ Nuevo: permite leer JSON
-app.use('/api', authRoutes); // ✅ Nuevo: activa rutas de autenticación
-app.use(pacientesRoutes);
-app.use(propietariosRoutes);
+// 3. Importar middleware
+const verifyToken = require('./middlewares/verifytoken');
 
+// 4. Importar rutas
+const authRoutes = require('./routes/auth');
+const pacientesRoutes = require('./routes/pacientes');
+const propietariosRoutes = require('./routes/propietarios');
+const tratamientosRoutes = require('./routes/tratamientos');
+
+// 5. Middlewares globales
+app.use(cors({
+  origin: "http://localhost:3000", // 👈 habilita tu frontend Next.js
+  credentials: true
+}));
+app.use(express.json());
+
+// 6. Usar rutas con prefijo /api
+app.use('/api', authRoutes);                               // rutas de autenticación
+app.use('/api/pacientes', verifyToken, pacientesRoutes);   // rutas de pacientes
+app.use('/api/propietarios', verifyToken, propietariosRoutes); // rutas de propietarios
+app.use('/api/tratamientos', verifyToken, tratamientosRoutes); // rutas de tratamientos
+
+// 7. Ruta base para probar que el servidor funciona
 app.get('/', (req, res) => {
-  res.send('✅ API funcionando y conectada a MySQL');
+  res.json({ message: '✅ API funcionando y conectada a MySQL' });
 });
 
+// 8. Iniciar servidor
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {   // 👈 importante para que sea accesible
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });

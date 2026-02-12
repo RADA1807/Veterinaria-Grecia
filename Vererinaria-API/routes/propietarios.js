@@ -4,7 +4,7 @@ const db = require('../models/db');
 const { v4: uuidv4 } = require('uuid');
 
 // 🧑‍🌾 Registrar un nuevo propietario
-router.post('/api/propietarios', async (req, res) => {
+router.post('/', async (req, res) => {
   const { nombre, telefono, correo, direccion } = req.body;
 
   if (!nombre) {
@@ -48,12 +48,23 @@ router.post('/api/propietarios', async (req, res) => {
   }
 });
 
-// 🔍 Obtener propietario por ID
-router.get('/api/propietarios/:id', async (req, res) => {
+// 🔍 Obtener propietario por ID (con sus mascotas)
+router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const [rows] = await db.query('SELECT nombre FROM propietarios WHERE id = ?', [id]);
+    const query = `
+      SELECT 
+        p.id, p.nombre, p.telefono, p.correo, p.direccion,
+        COUNT(pa.id) AS cantidad_pacientes,
+        GROUP_CONCAT(pa.nombre SEPARATOR ', ') AS nombres_mascotas
+      FROM propietarios p
+      LEFT JOIN pacientes pa ON pa.propietario_id = p.id
+      WHERE p.id = ?
+      GROUP BY p.id
+    `;
+
+    const [rows] = await db.query(query, [id]);
 
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Propietario no encontrado' });
@@ -67,7 +78,7 @@ router.get('/api/propietarios/:id', async (req, res) => {
 });
 
 // 📋 Obtener propietarios con filtros, paginación, cantidad de pacientes y nombres de mascotas
-router.get('/api/propietarios', async (req, res) => {
+router.get('/', async (req, res) => {
   const { nombre, limit = 10, offset = 0 } = req.query;
 
   try {
