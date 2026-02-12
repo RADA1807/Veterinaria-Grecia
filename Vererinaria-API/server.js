@@ -20,7 +20,7 @@ const tratamientosRoutes = require('./routes/tratamientos');
 
 // 5. Middlewares globales
 app.use(cors({
-  origin: "http://localhost:3000", // 👈 habilita tu frontend Next.js
+  origin: "*", // 👈 habilita tu frontend Next.js
   credentials: true
 }));
 app.use(express.json());
