@@ -13,8 +13,9 @@ const pool = mysql.createPool({
   queueLimit: 0,
   // 🔽 ESTA ES LA PIEZA CLAVE PARA DIGITALOCEAN 🔽
   ssl: {
-    rejectUnauthorized: false
-  }
+  ca: fs.readFileSync("ca-certificate.crt")
+}
+
 });
 
 // Prueba de conexión mejorada
